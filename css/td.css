@@ -1,0 +1,976 @@
+/* =====================================================================
+   TD-SOLAR override layer
+   The visual source of truth is the linked template stylesheet
+   (assets/.../css/zailar.webflow.shared.59aa64a93.css).
+   This file ONLY: swaps the hero photo to ours, replays the template's
+   own button slide-hover (its own 250% values) without Webflow JS,
+   and styles the 3 blocks the template page does not contain
+   (Qualität, FAQ, Anfrageformular) using the template's tokens.
+   ===================================================================== */
+
+:root{
+  --td-ink:#000014; --td-muted:#4c5265; --td-accent:#0246d0; --td-accent-2:#4957f4;
+  --td-bg:#f6f6f6; --td-border:#e6e6e6; --td-border-blue:#eaeff4; --td-radius:15px;
+  --td-ease:cubic-bezier(.16,1,.3,1);
+}
+
+/* keep our images crisp, no horizontal scroll.
+   clip (not hidden) so it does NOT create a scroll container -> position:sticky works */
+html,body{overflow-x:clip;}
+
+/* ---- reveal: hidden only when Motion is active (.anim), with a failsafe ----
+   If Motion (CDN) fails to load, the failsafe class (added after 2.6s) forces
+   everything visible, so content is never permanently hidden. */
+.anim .reveal{opacity:0;}
+.anim.anim-failsafe .reveal{opacity:1 !important;transform:none !important;filter:none !important;}
+
+/* accessible focus ring (single accent) */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.td-svc-item:focus-visible{
+  outline:3px solid var(--td-accent);outline-offset:2px;border-radius:6px;
+}
+.td-svc-item{cursor:pointer;}
+
+/* ---- HERO: new banner image + premium readability overlays ----
+   Left scrim (for the description) + bottom scrim (for the headline),
+   so the bright sky/sun stays visible while white text stays legible. */
+.banner-wrapper{
+  background-image:
+    linear-gradient(90deg, rgba(0,0,15,.52) 0%, rgba(0,0,15,.14) 42%, rgba(0,0,15,0) 66%),
+    linear-gradient(180deg, rgba(0,0,15,.22) 0%, rgba(0,0,15,0) 30%, rgba(0,0,15,.80) 100%),
+    url("../assets/img/hero-banner.png") !important;
+  background-position:50% 50% !important;
+  background-size:cover !important;
+}
+
+/* headline: main offer, bigger; two lines on desktop (controlled break), natural wrap on mobile */
+.banner-heading{font-size:clamp(2.3rem,5vw,4rem) !important;letter-spacing:-.035em !important;line-height:1.04 !important;font-weight:600 !important;}
+.banner-heading-wrapper{max-width:1280px;margin-inline:auto;}
+.hb-break{display:none;}
+@media(min-width:900px){
+  .hb-break{display:inline;}
+  /* main offer + CTAs anchored to the LEFT content block (under the small
+     text + icon), readable on the darker part of the banner, inside the grid */
+  .banner-heading-wrapper{width:76%;max-width:1100px;margin-left:0;margin-right:auto;text-align:left;}
+  .banner-heading{font-size:clamp(2rem,3.2vw,2.9rem) !important;margin-right:auto;}
+}
+
+/* description: smaller + lighter weight, three tidy lines */
+.banner-element-description{max-width:560px !important;}
+.banner-description-text{font-size:17px !important;font-weight:300 !important;line-height:26px !important;letter-spacing:-.2px !important;max-width:42ch !important;}
+@media(max-width:767px){ .banner-element-description{max-width:100% !important;padding-left:0 !important;} .banner-description-text{max-width:38ch !important;} }
+
+/* rotating accent icon (like the reference banner element) */
+@keyframes td-spin{ to{ transform:rotate(360deg); } }
+.banner-element{ animation:td-spin 9s linear infinite; transform-origin:center; will-change:transform; }
+
+/* =====================================================================
+   UNIFIED GRID: 90px side padding on desktop, adaptive on smaller screens
+   (applies to every section that uses .container, plus the footer)
+   ===================================================================== */
+/* TRUE 90px side gutter on desktop: no max-width cap (a cap would center the
+   content and turn the visible gap into far more than 90px on wide screens).
+   The gutter is the padding itself, exactly 90px from ~1500px up, scaling down
+   adaptively on smaller screens. */
+.container{ max-width:none !important; margin-inline:0 !important; padding-inline:clamp(20px, 6vw, 90px) !important; }
+.footer-content{ max-width:none !important; margin-inline:0 !important; padding-inline:clamp(20px, 6vw, 90px) !important; padding-bottom:20px !important; }
+.navbar-container{ max-width:none !important; margin-inline:0 !important; padding-inline:clamp(20px, 6vw, 90px) !important; }
+.banner-typography{ max-width:none !important; margin-inline:0 !important; padding-inline:calc(clamp(20px, 6vw, 90px) - 10px) !important; } /* -10px offsets the .banner-content frame so text lands on the exact 90px gutter */
+.banner-element-description{ padding-left:0 !important; }
+
+/* Uniform 120px vertical spacing between content blocks (desktop), scaling down on
+   smaller screens. Hero (banner) and footer keep their own spacing. */
+.section:not(.banner):not(.footer){
+  padding-top:clamp(64px, 8.4vw, 120px) !important;
+  padding-bottom:clamp(64px, 8.4vw, 120px) !important;
+}
+/* tighter gap between Arbeitsprozess (#ablauf) and Qualität (#qualitaet) */
+#ablauf{ padding-bottom:clamp(28px, 3.4vw, 48px) !important; }
+#qualitaet{ padding-top:clamp(28px, 3.4vw, 48px) !important; }
+
+/* =====================================================================
+   ÜBER UNS: aligned grid composition (image top-aligned with text,
+   button sits directly under the text, readable column)
+   ===================================================================== */
+.section.about-us .about-us-content{
+  display:grid;
+  grid-template-columns:minmax(0,0.92fr) minmax(0,1.08fr);
+  gap:clamp(2rem,4vw,4.5rem);
+  align-items:stretch;
+}
+.section.about-us .about-us-image-wrapper{ max-width:none; height:100%; min-height:360px; }
+.section.about-us .about-us-image{ height:100%; object-fit:cover; }
+.section.about-us .about-us-typography{ min-height:auto; max-width:600px; justify-content:flex-start; }
+.section.about-us .about-us-description-text{ line-height:1.6; max-width:60ch; }
+.section.about-us .about-us-button-wrapper{ margin-top:32px; }
+@media(max-width:900px){
+  .section.about-us .about-us-content{ grid-template-columns:1fr; }
+  .section.about-us .about-us-image-wrapper{ height:auto; max-width:100%; min-height:0; }
+  .section.about-us .about-us-image{ height:auto; }
+}
+
+/* =====================================================================
+   ÜBER UNS windmill: decorative only, must NOT overlap the text/button.
+   Pin it to the bottom-right corner behind the content (lower z-index),
+   raise the text + button above it, shrink ~20% and drop it lower.
+   ===================================================================== */
+/* overflow visible so the windmill tower can reach down into the next (grey) section;
+   horizontal scroll is already prevented globally by html,body{overflow-x:clip} */
+.section.about-us{ position:relative; overflow:visible; }
+
+/* text + button always readable on top of the decor */
+.section.about-us .about-us-content,
+.section.about-us .about-us-typography,
+.section.about-us .about-us-button-wrapper,
+.section.about-us .about-us-section-title-wrapper{ position:relative; z-index:2; }
+
+/* Windmill (decorative, right side of "Über uns").
+   Position of the whole windmill (right / bottom / overall zone) is unchanged.
+   The container is sized height = 2 * mast, anchored bottom:0 on the about/grey seam.
+   The MAST is static, base on the seam (bottom:0), height = --mast, so its TOP is at
+   exactly --mast above the seam = the vertical mid-line of the container.
+   The BLADES are absolute at top:50% / left:50% with translate(-50%,-50%), so their
+   HUB (their own centre, transform-origin center center) sits EXACTLY on the mast top.
+   translate(-50%,-50%) is present in the base rule AND in both keyframes, so the
+   propeller pivots around its hub and never drifts or flies off the axis. */
+.td-windmill{
+  --mast:clamp(135px,12.5vw,188px);
+  position:absolute;
+  right:clamp(16px,2.6vw,52px);                 /* unchanged */
+  bottom:0;                                     /* unchanged: container bottom on the seam */
+  width:clamp(150px,15vw,224px);                /* = blades width */
+  height:calc(var(--mast) * 2);                 /* mid-line == mast top == hub */
+  z-index:1; pointer-events:none;
+}
+/* blades: centred on the container mid-line, rotate around their own hub, no drift.
+   width:108% enlarges only the propeller; left/top:50% + translate(-50%,-50%) keep the
+   hub locked on the mast top regardless of size (no shift). */
+.td-windmill-blades{
+  position:absolute; left:50%; top:50%; z-index:1;
+  width:108%; height:auto; display:block;
+  transform:translate(-50%,-50%) rotate(0deg);
+  transform-origin:center center;
+  animation:td-windmill-spin 7s linear infinite;
+  will-change:transform;
+}
+@keyframes td-windmill-spin{
+  from{ transform:translate(-50%,-50%) rotate(0deg); }
+  to{   transform:translate(-50%,-50%) rotate(360deg); }
+}
+/* static mast: centred, base exactly on the seam, top meets the hub */
+.td-windmill-tower{
+  position:absolute; left:50%; bottom:0;
+  transform:translateX(-50%);
+  width:auto; height:var(--mast); display:block;
+}
+/* tablet: blades a touch smaller; mobile: hidden so it never crowds the text */
+@media(max-width:1200px){
+  .td-windmill{ width:clamp(140px,15vw,196px); }
+}
+@media(max-width:991px){ .td-windmill{ display:none; } }
+@media(prefers-reduced-motion:reduce){ .td-windmill-blades{ animation:none; } }
+
+/* honest hero info card (no fabricated numbers) */
+.td-hero-card{
+  background:rgba(255,255,255,.14);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.28);border-radius:var(--td-radius);padding:18px 22px;color:#fff;min-width:210px;
+}
+.td-hero-card .n{font-family:Geist,sans-serif;font-size:clamp(2.2rem,4vw,3.4rem);font-weight:500;line-height:1;letter-spacing:-.05em;}
+.td-hero-card .t{display:block;margin-top:8px;text-transform:uppercase;font-size:14px;letter-spacing:.02em;color:rgba(255,255,255,.86);}
+
+/* right stat card: EXACT template stepped/notch shape (like the reference),
+   but filled with translucent glass + backdrop blur instead of solid blue.
+   The L-notch silhouette comes from the template's card-shape PNG used as a mask
+   on a glass pseudo-element; the media tile sits in the top-right notch. */
+.banner-card-wrapper{ width:320px; filter:drop-shadow(0 26px 50px rgba(0,0,20,.30)); }
+.banner-card-bg{ display:none !important; }
+.banner-card-single{
+  position:relative;
+  width:100%;
+  aspect-ratio:300 / 320;
+  min-height:300px;
+  background:none;
+  border:0; box-shadow:none; overflow:visible;
+}
+/* masked glass body (semi-transparent + blur), shaped to the stepped silhouette */
+.banner-card-single::before{
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(28,56,104,.30) 100%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-mask:url("../assets/tpl/card-bg.png") center / 100% 100% no-repeat;
+  mask:url("../assets/tpl/card-bg.png") center / 100% 100% no-repeat;
+}
+.banner-card-typography{ z-index:2; }
+/* media tile sits in the top-right notch (≈30.7% x 28.7% of the card).
+   .card-video is now a translucent GLASS SUBSTRATE; the video sits inside it with
+   inner padding so it never touches the card edges directly (premium inset look). */
+/* media tile in the top-right notch: a full rounded media-card that fills the notch
+   (the cut-out is ~30.7% x 28.7% of the card). The video fills it edge to edge, the
+   corners are large and soft to match the main glass-card, and there is only a hairline
+   border -- no thick frame, no inner padding. */
+.card-video{
+  position:absolute !important; inset:auto !important;
+  top:6px !important; right:6px !important;          /* small even inset inside the notch */
+  width:calc(30.7% - 12px) !important; height:calc(28.7% - 12px) !important; max-width:none !important;
+  padding:0;
+  background:rgba(0,0,20,.18);                       /* quiet fallback behind the video */
+  border:1px solid rgba(255,255,255,.18);           /* hairline, not a thick frame */
+  border-radius:11px !important;                     /* same gentle rounding as the main card */
+  box-shadow:0 10px 28px rgba(0,0,0,.22);
+  overflow:hidden; z-index:3;
+}
+/* video fills the whole media-card, clipped to its soft corners */
+.card-video-el{ width:100%; height:100%; border-radius:inherit; object-fit:cover; display:block; }
+
+/* hero CTA row: anchored left under the offer on desktop, centered on mobile */
+.td-hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;justify-content:center;}
+@media(min-width:900px){ .td-hero-actions{justify-content:flex-start;} }
+/* offer sits close to the small text/card row above (one tight left composition) */
+@media(min-width:900px){ .banner-heading-wrapper{margin-top:clamp(6px,1vw,16px);} }
+.banner-typography-card-wrap{margin-bottom:16px !important;}
+
+/* ---- HERO entrance: pure CSS, plays immediately on load (no CDN wait) ---- */
+@keyframes td-hero-in{ from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:none;} }
+@keyframes td-hero-card-in{ from{opacity:0;transform:translateY(20px) scale(.97);} to{opacity:1;transform:none;} }
+.section.banner .banner-element-description{ animation:td-hero-in .8s cubic-bezier(.22,1,.36,1) .05s both; }
+.section.banner .banner-card-wrapper{ animation:td-hero-card-in .8s cubic-bezier(.22,1,.36,1) .12s both; }
+.section.banner .banner-heading-wrapper{ animation:td-hero-in .8s cubic-bezier(.22,1,.36,1) .14s both; }
+.section.banner .td-hero-actions{ animation:td-hero-in .8s cubic-bezier(.22,1,.36,1) .22s both; }
+@media(prefers-reduced-motion:reduce){
+  .section.banner .banner-element-description,.section.banner .banner-card-wrapper,
+  .section.banner .banner-heading-wrapper,.section.banner .td-hero-actions{ animation:none; }
+}
+
+/* hero card-wrap stacks cleanly on mobile so the stat card + video drop below.
+   The stat card (numbers + video) is shrunk to compact, right-aligned proportions. */
+@media(max-width:767px){
+  .banner-typography-card-wrap{flex-direction:column;align-items:flex-start;gap:22px;}
+  .banner-card-wrapper{ width:min(58vw,228px); max-width:228px; margin-bottom:0; align-self:flex-end; }
+  .banner-card-single{ min-height:0; }                 /* let aspect-ratio drive the (now smaller) height */
+  .banner-card-typography{ padding:15px 0 15px 15px; }
+  .banner-card-number{ font-size:46px; letter-spacing:-2.6px; margin-bottom:2px; }
+  .banner-card-number-pluse{ font-size:32px; }
+  .banner-card-tag{ font-size:11px; line-height:15px; letter-spacing:-.3px; }
+  .banner-card-description-text{ font-size:11px; line-height:15px; max-width:118px; letter-spacing:-.3px; }
+}
+.td-hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+.td-hero-badges .services-category-tag{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;text-transform:none;}
+
+/* ---- BUTTON slide-hover (replays template's own 250% interaction, no Webflow JS) ---- */
+.primary-button .primary-button-text-block{transition:transform .4s var(--td-ease);}
+.primary-button .primary-button-text-block.is-text-absolute{inset:0;display:flex;align-items:center;justify-content:center;transform:translateY(250%);}
+.primary-button:hover .primary-button-text-block:not(.is-text-absolute){transform:translateY(-250%);}
+.primary-button:hover .primary-button-text-block.is-text-absolute{transform:translateY(0);}
+.primary-button{cursor:pointer;}
+/* WhatsApp icon inside primary button */
+.primary-button .pb-ico{position:relative;z-index:1;width:18px;height:18px;margin-right:8px;flex:none;}
+
+/* ---- NAV hovers ---- */
+.nav-link{transition:background-color .3s var(--td-ease),color .3s var(--td-ease),transform .3s var(--td-ease);}
+/* sit the menu right next to the logo: kill Webflow's auto side-margins on the links */
+.nav-menu{ margin-left:18px; }
+.nav-link.w-nav-link{ margin-left:0 !important; margin-right:0 !important; }
+/* active "Home" pill: drop the template's active-dot icon + asymmetric left padding so the label is centred like the others */
+.nav-link.w--current{ background-image:none !important; padding-left:15px !important; padding-right:15px !important; }
+.nav-link:hover{background:var(--td-accent) !important;color:#fff !important;transform:translateY(-1px);}
+.nav-link.w--current{background:rgba(255,255,255,.32);}
+.td-brand{transition:opacity .3s var(--td-ease);}
+.td-brand:hover{opacity:.82;}
+.td-brand .m{transition:transform .4s var(--td-ease),box-shadow .4s var(--td-ease);}
+.td-brand:hover .m{transform:rotate(-8deg) scale(1.06);box-shadow:0 8px 20px -8px rgba(2,70,208,.7);}
+.td-burger{transition:background-color .3s var(--td-ease);}
+.td-burger:hover{background:rgba(255,255,255,.34);}
+
+/* ---- NAV: brand text, frosted pills already styled by template ---- */
+.td-brand{display:inline-flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:22px;letter-spacing:-.02em;text-decoration:none;}
+.td-brand>span{display:inline-flex;flex-direction:column;line-height:1;}
+.td-brand .m{width:38px;height:38px;border-radius:10px;background:var(--td-accent);display:grid;place-items:center;flex:none;}
+.td-brand .m svg{width:22px;height:22px;color:#fff;}
+.td-brand small{display:block;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;opacity:.75;line-height:1;margin-top:2px;}
+.td-burger{display:none;width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.2);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);place-items:center;}
+.td-burger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;}
+.td-burger span+span{margin-top:5px;}
+@media(max-width:991px){
+  .nav-menu{display:none;}
+  .td-burger{display:grid;}
+}
+
+/* mobile menu */
+.td-mnav{position:fixed;inset:0;z-index:1000;background:var(--td-ink);color:#fff;display:flex;flex-direction:column;gap:18px;padding:90px 24px 30px;transform:translateX(100%);transition:transform .5s var(--td-ease);visibility:hidden;overflow:auto;}
+body.mnav-open .td-mnav{transform:none;visibility:visible;}
+.td-mnav a.l{font-family:Geist,sans-serif;font-size:26px;font-weight:500;color:#fff;text-decoration:none;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);}
+.td-mnav .c{margin-top:auto;display:grid;gap:10px;}
+.td-mnav .c a{color:rgba(255,255,255,.8);text-decoration:none;}
+.td-mclose{position:absolute;top:24px;right:24px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);color:#fff;display:grid;place-items:center;background:none;}
+
+/* ---- SERVICES: header (heading left / eyebrow + button right) ---- */
+/* remove the template divider line + its big padding under the header */
+.section-title-wrapper.our-services{ border-bottom:0 !important; padding-bottom:0 !important; margin-bottom:clamp(28px,3.2vw,42px) !important; }
+.our-services-content{ max-width:none !important; margin-left:0 !important; margin-right:0 !important; width:100% !important; }
+.td-svc-head{
+  display:grid; grid-template-columns:1fr auto;
+  gap:clamp(24px,4vw,64px); align-items:start; margin-bottom:0;
+}
+.td-svc-title{ margin:0 !important; max-width:none !important; width:auto !important; }
+/* subtitle now sits above the heading, left aligned */
+.td-svc-head-main{ display:flex; flex-direction:column; align-items:flex-start; }
+.td-svc-head-main .section-subtitle{ margin:0 0 14px; }
+.lb{ display:none; }
+@media(min-width:768px){ .lb{ display:inline; } }
+/* more air between the *Unsere Leistungen label and the button */
+.td-svc-head-side{ display:flex; flex-direction:column; align-items:flex-end; text-align:right; gap:clamp(24px,2.4vw,36px); padding-top:6px; }
+.td-svc-head-side .section-subtitle{ margin:0; }
+@media(max-width:767px){
+  .td-svc-head{ grid-template-columns:1fr; gap:20px; }
+  .td-svc-head-side{ flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; text-align:left; gap:16px; padding-top:0; }
+}
+
+/* ---- SERVICES: premium responsive card grid (1 / 2 / 3 columns), full width ---- */
+.td-svc-grid{
+  display:grid;
+  grid-template-columns:1fr;            /* mobile: 1 column */
+  gap:clamp(16px,1.6vw,24px);
+  align-items:stretch;
+  width:100%;
+}
+@media(min-width:640px){  .td-svc-grid{grid-template-columns:repeat(2,1fr);} }   /* tablet: 2 */
+@media(min-width:1100px){ .td-svc-grid{grid-template-columns:repeat(3,1fr);} }   /* desktop: 3 */
+
+.td-svc-card{
+  display:flex;flex-direction:column;
+  background:#fff;
+  border:1px solid var(--td-border-blue);
+  border-radius:var(--td-radius);
+  padding:clamp(20px,1.7vw,26px);
+  overflow:hidden;
+  text-decoration:none;
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+  transition:transform .4s var(--td-ease),box-shadow .4s var(--td-ease),border-color .4s var(--td-ease);
+  will-change:transform;
+}
+/* full-bleed photo at the top of every card, uniform height, rounded by the card clip */
+.td-svc-thumb{
+  margin:calc(-1 * clamp(20px,1.7vw,26px));
+  margin-bottom:clamp(18px,1.6vw,22px);
+  height:clamp(150px,12vw,178px);
+  overflow:hidden;
+  background:var(--td-soft,#f4f7fb);
+}
+.td-svc-thumb img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform 1.1s var(--td-ease); }
+.td-svc-card:hover .td-svc-thumb img{ transform:scale(1.05); }
+.td-svc-card-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px;}
+.td-svc-cat{color:var(--td-muted);text-transform:uppercase;background:var(--td-soft,#f4f7fb);border:1px solid var(--td-border-blue);border-radius:100px;padding:6px 16px;font-size:12.5px;font-weight:500;letter-spacing:.04em;}
+.td-svc-name{color:var(--td-ink);font-family:Geist,sans-serif;font-size:clamp(1.15rem,1.5vw,1.4rem);font-weight:500;letter-spacing:-.03em;line-height:1.1;margin:0 0 10px;transition:color .4s var(--td-ease);}
+.td-svc-desc{color:var(--td-muted);font-size:15px;line-height:1.55;margin:0;}
+.td-svc-arrow{width:46px;height:46px;flex:none;border-radius:50%;border:1px solid var(--td-border);display:grid;place-items:center;transition:background-color .4s var(--td-ease),border-color .4s var(--td-ease);}
+.td-svc-arrow svg{width:17px;height:17px;color:var(--td-ink);transition:transform .4s var(--td-ease),color .4s var(--td-ease);}
+/* premium hover: lift + stronger tinted shadow + accent arrow */
+.td-svc-card:hover,.td-svc-card:focus-visible{transform:translateY(-6px);box-shadow:0 18px 40px -16px rgba(16,24,40,.22);border-color:var(--td-accent);}
+.td-svc-card:hover .td-svc-name,.td-svc-card:focus-visible .td-svc-name{color:var(--td-accent);}
+.td-svc-card:hover .td-svc-arrow,.td-svc-card:focus-visible .td-svc-arrow{background:var(--td-accent);border-color:var(--td-accent);}
+.td-svc-card:hover .td-svc-arrow svg,.td-svc-card:focus-visible .td-svc-arrow svg{color:#fff;transform:translate(2px,-2px);}
+/* full-width premium blue CTA banner */
+.td-services-note{
+  margin-top:clamp(28px,3vw,40px); width:100%;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;
+  background:linear-gradient(120deg, var(--td-accent) 0%, var(--td-accent-2) 100%);
+  color:#fff; border-radius:20px; padding:clamp(26px,3vw,40px) clamp(26px,3.5vw,52px);
+  box-shadow:0 26px 64px -22px rgba(2,70,208,.55), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.td-services-note p{display:flex;align-items:center;gap:14px;font-weight:500;margin:0;font-size:clamp(1.05rem,1.5vw,1.35rem);letter-spacing:-.01em;max-width:42ch;}
+.td-services-note img{width:28px;height:28px;flex:none;filter:brightness(0) invert(1);}
+/* white pill button on the blue banner */
+.td-services-note .primary-button{background:#fff !important;flex:none;}
+.td-services-note .primary-button .primary-button-text-block{color:var(--td-accent) !important;}
+
+/* ---- WORKING PROCESS: cleaner header (no divider line) + right-aligned CTA ---- */
+.our-woking-process-section-title-wrap{ border-bottom:0 !important; padding-bottom:0 !important; margin-bottom:18px !important; }
+.td-proc-cta{ display:flex; justify-content:flex-end; margin-top:clamp(28px,3vw,40px); }
+
+/* ---- WORKING PROCESS: uniform 3x2 premium card grid (all 6 steps equal) ---- */
+.td-proc-grid{
+  display:grid;
+  grid-template-columns:1fr;                 /* mobile: 1 column */
+  gap:clamp(16px,1.6vw,24px);
+  align-items:stretch;
+}
+@media(min-width:640px){  .td-proc-grid{grid-template-columns:repeat(2,1fr);} }   /* tablet: 2 */
+@media(min-width:992px){  .td-proc-grid{grid-template-columns:repeat(3,1fr);} }   /* desktop: 3 -> 3x2 */
+
+.td-proc-card{
+  --d:0s;
+  display:flex;flex-direction:column;
+  height:100%;                               /* equal height across the row (grid stretch) */
+  background:#fff;
+  border:1px solid var(--td-border-blue);
+  border-radius:var(--td-radius);
+  padding:clamp(22px,1.9vw,28px);            /* compact, no oversized empty zones */
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+  transition:opacity .6s var(--td-ease) var(--d),transform .6s var(--td-ease) var(--d),box-shadow .45s var(--td-ease),border-color .45s var(--td-ease);
+  will-change:transform;
+}
+/* stable internal grid: number+icon top-left, label top-right; title; text.
+   equal top block height + equal gaps so titles/descriptions line up across all cards. */
+.td-proc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:46px;margin-bottom:clamp(20px,1.8vw,26px);}
+.td-proc-head .woking-process-tag{margin-left:auto;}
+.td-proc-body{margin-top:0;}
+.td-proc-card .woking-process-name{margin:0 0 10px;min-height:2.3em;}
+.td-proc-card .woking-process-description-text{margin:0;line-height:1.55;}
+
+/* premium hover: lift + soft shadow + accent border + subtle icon/label motion */
+.td-proc-card:hover{transition-delay:0s;transform:translateY(-6px);box-shadow:0 24px 60px -20px rgba(16,24,40,.18);border-color:var(--td-accent);}
+.td-proc-card .woking-process-card-icon-wrap{transition:transform .45s var(--td-ease);}
+.td-proc-card:hover .woking-process-card-icon-wrap{transform:scale(1.08);}
+.td-proc-card .woking-process-tag{transition:transform .45s var(--td-ease);}
+.td-proc-card:hover .woking-process-tag{transform:translateX(4px);}
+/* icon recolour: the SVG (stroke art) is used as a MASK (declared inline per icon so
+   the url resolves relative to the document) and background-color sets the exact colour.
+   Default near-black, brand blue on hover of THAT card only. */
+.woking-process-card-icon{
+  display:block; flex:none;
+  background-color:#000014;
+  transition:background-color .3s var(--td-ease);
+}
+.td-proc-card:hover .woking-process-card-icon{ background-color:var(--td-accent); }
+
+/* ---- WORKING PROCESS reveal: card slide+fade staggered, inner elements fade in sequence
+        (driven by .in added via IntersectionObserver in td.js -> reliable, no CDN wait) ---- */
+.js .td-proc-card{opacity:0;transform:translateY(28px);}
+.td-proc-card:nth-child(1){--d:.04s}
+.td-proc-card:nth-child(2){--d:.12s}
+.td-proc-card:nth-child(3){--d:.20s}
+.td-proc-card:nth-child(4){--d:.28s}
+.td-proc-card:nth-child(5){--d:.36s}
+.td-proc-card:nth-child(6){--d:.44s}
+.td-proc-grid.in .td-proc-card{opacity:1;transform:none;}
+/* inner elements fade in (opacity only -> keeps transform free for hover) */
+.js .td-proc-card .td-proc-head,
+.js .td-proc-card .woking-process-name,
+.js .td-proc-card .woking-process-description-text{opacity:0;transition:opacity .55s var(--td-ease);}
+.td-proc-grid.in .td-proc-card .td-proc-head{opacity:1;transition-delay:calc(var(--d) + .12s);}
+.td-proc-grid.in .td-proc-card .woking-process-name{opacity:1;transition-delay:calc(var(--d) + .20s);}
+.td-proc-grid.in .td-proc-card .woking-process-description-text{opacity:1;transition-delay:calc(var(--d) + .28s);}
+@media(prefers-reduced-motion:reduce){
+  .js .td-proc-card,.js .td-proc-card .td-proc-head,.js .td-proc-card .woking-process-name,.js .td-proc-card .woking-process-description-text{opacity:1 !important;transform:none !important;}
+}
+
+/* ---- QUALITÄT (about-style: image + title + text + chips) ---- */
+.td-quality-grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:center;}
+@media(min-width:992px){.td-quality-grid{grid-template-columns:1.05fr .95fr;}}
+.td-quality-img{border-radius:var(--td-radius);overflow:hidden;aspect-ratio:4/3.2;}
+.td-quality-img img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--td-ease);}
+.td-quality-img:hover img{transform:scale(1.05);}
+.td-quality-chips{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0;}
+@media(max-width:479px){.td-quality-chips{grid-template-columns:1fr;}}
+.td-chip{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--td-border);border-radius:12px;padding:14px 16px;font-size:15px;font-weight:500;color:var(--td-ink);}
+.td-chip svg{width:20px;height:20px;color:var(--td-accent);flex:none;margin-top:1px;}
+
+/* ---- PROJEKTE: header on the LEFT (eyebrow + title), CTA on the right ---- */
+.td-proj-head{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:clamp(24px,4vw,56px); margin-bottom:clamp(30px,3.5vw,46px); }
+.td-proj-head-side{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; gap:14px; }
+.td-proj-head-side .section-subtitle{ margin:0; }
+.td-proj-title{ margin:0 !important; max-width:none !important; }
+.td-proj-cta{ flex:none; }
+@media(max-width:767px){
+  .td-proj-head{ grid-template-columns:1fr; gap:20px; }
+}
+
+/* ---- PROJEKTE (image cards, template tokens) ---- */
+.td-projects{display:grid;grid-template-columns:1fr;gap:24px;}
+@media(min-width:700px){.td-projects{grid-template-columns:1fr 1fr;}}
+.td-project{position:relative;border-radius:var(--td-radius);overflow:hidden;min-height:360px;display:flex;align-items:flex-end;color:#fff;isolation:isolate;}
+.td-project img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--td-ease);}
+.td-project::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,20,.05) 30%,rgba(0,0,20,.82) 100%);}
+.td-project:hover img{transform:scale(1.06);}
+.td-project__b{padding:clamp(22px,3vw,34px);}
+.td-project__b .cat{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;text-transform:uppercase;border-radius:100px;padding:6px 16px;font-size:13px;font-weight:500;margin-bottom:14px;}
+.td-project__b h3{font-family:Geist,sans-serif;color:#fff;font-size:clamp(1.4rem,2.2vw,1.9rem);font-weight:500;letter-spacing:-.03em;margin-bottom:10px;}
+.td-project__b p{color:rgba(255,255,255,.85);font-size:15px;max-width:46ch;}
+@media(min-width:700px){.td-project:nth-child(1),.td-project:nth-child(4){min-height:420px;}}
+
+/* ---- ANFRAGEFORMULAR (CTA-blue card area, template tokens) ---- */
+.td-form-grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:start;}
+@media(min-width:992px){.td-form-grid{grid-template-columns:.85fr 1.15fr;}}
+.td-contact{display:grid;gap:12px;margin-top:28px;}
+.td-contact a,.td-contact div.row{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--td-border);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--td-ink);transition:border-color .4s var(--td-ease);}
+.td-contact a:hover{border-color:var(--td-accent);}
+.td-contact svg{width:24px;height:24px;color:var(--td-accent);flex:none;}
+.td-contact span{display:block;font-size:13px;color:var(--td-muted);}
+.td-contact strong{font-weight:600;}
+.td-formcard{background:#fff;border:1px solid var(--td-border);border-radius:20px;padding:clamp(22px,3vw,36px);box-shadow:0 30px 60px -40px rgba(0,0,20,.4);}
+.td-formrow{display:grid;grid-template-columns:1fr;gap:16px;}
+@media(min-width:560px){.td-formrow{grid-template-columns:1fr 1fr;}}
+.td-field{display:flex;flex-direction:column;gap:6px;}
+.td-field.full{grid-column:1/-1;}
+.td-field label{font-size:14px;font-weight:600;color:var(--td-ink);}
+.td-field .req{color:var(--td-accent);}
+.td-field input,.td-field select,.td-field textarea{background:var(--td-bg);border:1.5px solid var(--td-border);border-radius:12px;padding:14px 16px;font:inherit;color:var(--td-ink);width:100%;}
+.td-field textarea{min-height:120px;resize:vertical;}
+.td-field input:focus,.td-field select:focus,.td-field textarea:focus{outline:none;border-color:var(--td-accent);background-color:#fff;}
+.td-field.err input,.td-field.err select,.td-field.err textarea{border-color:#c0392b;}
+.td-field .e{display:none;color:#c0392b;font-size:13px;}
+.td-field.err .e{display:block;}
+.td-consent{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;color:var(--td-muted);font-size:14px;}
+.td-consent input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--td-accent);}
+.td-consent a{color:var(--td-accent);text-decoration:underline;font-weight:500;}
+/* lighter, non-bold consent text */
+.td-consent,.td-consent span{font-weight:400;line-height:1.5;}
+/* custom, perfectly centred select chevron */
+.td-field select{
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  background-color:var(--td-bg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234c5265' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 16px center;
+  background-size:16px 16px;
+  padding-right:46px;
+}
+.td-formactions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;}
+.td-status{grid-column:1/-1;border-radius:12px;padding:14px 16px;font-weight:500;font-size:15px;display:none;}
+.td-status.show{display:block;}
+.td-status.ok{background:var(--td-border-blue);color:var(--td-accent);}
+.td-status.bad{background:#fdecea;color:#c0392b;}
+.td-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+/* ---- FAQ accordion (template tokens) ---- */
+.td-faq-grid{display:grid;grid-template-columns:1fr;gap:40px;align-items:start;}
+@media(min-width:992px){
+  .td-faq-grid{grid-template-columns:.8fr 1.2fr;}
+  /* left column rides along while the question list scrolls (desktop/tablet only) */
+  .td-faq-left{position:sticky;top:110px;align-self:start;}
+}
+.td-faq-list{border-top:1px solid var(--td-border);}
+.td-faq-item{border-bottom:1px solid var(--td-border);}
+.td-faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 0;text-align:left;background:none;border:0;cursor:pointer;font-family:Geist,sans-serif;font-weight:500;font-size:clamp(1.05rem,1.6vw,1.35rem);color:var(--td-ink);letter-spacing:-.02em;}
+.td-faq-ic{position:relative;width:22px;height:22px;flex:none;}
+.td-faq-ic::before,.td-faq-ic::after{content:"";position:absolute;background:var(--td-accent);border-radius:2px;transition:transform .35s var(--td-ease),opacity .35s var(--td-ease);}
+.td-faq-ic::before{top:50%;left:0;right:0;height:2px;transform:translateY(-50%);}
+.td-faq-ic::after{left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);}
+.td-faq-item.open .td-faq-ic::after{transform:translateX(-50%) scaleY(0);opacity:0;}
+.td-faq-a{overflow:hidden;height:0;transition:height .4s var(--td-ease);}
+.td-faq-a-in{padding:0 0 24px;color:var(--td-muted);max-width:65ch;}
+
+/* ---- MODAL ---- */
+.td-modal{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:16px;background:rgba(0,0,20,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .35s var(--td-ease),visibility .35s;}
+.td-modal.open{opacity:1;visibility:visible;}
+.td-modal__d{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:clamp(22px,4vw,34px);transform:translateY(20px) scale(.98);transition:transform .4s var(--td-ease);}
+.td-modal.open .td-modal__d{transform:none;}
+.td-modal__h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.td-modal__h h2{font-family:Geist,sans-serif;font-size:26px;color:var(--td-ink);letter-spacing:-.03em;}
+.td-modal__h p{color:var(--td-muted);font-size:15px;margin-top:6px;}
+.td-modal__x{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--td-border);background:none;display:grid;place-items:center;cursor:pointer;transition:transform .3s var(--td-ease),background-color .3s var(--td-ease);}
+.td-modal__x:hover{background:var(--td-bg);transform:rotate(90deg);}
+
+/* honest sizing helpers for our sections that reuse template section-title */
+.td-section-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:48px;}
+.td-section-head .section-subtitle{margin-bottom:14px;}
+
+/* mobile: stop the big section headline (long German compound words) from
+   forcing horizontal overflow. Stack the eyebrow above the title, shrink the
+   font and allow long words to wrap. */
+@media(max-width:767px){
+  .td-section-head{align-items:flex-start;}
+  .section-subtitle-title{flex-direction:column;align-items:flex-start;gap:10px;}
+  .section-subtitle-title,.section-title-box,.section-title{min-width:0;max-width:100%;}
+  .section-title{font-size:clamp(2rem,8vw,2.6rem) !important;line-height:1.1 !important;letter-spacing:-.03em !important;overflow-wrap:anywhere;}
+  .section-title.services{font-size:clamp(2rem,8vw,2.6rem) !important;max-width:100% !important;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1 !important;transform:none !important;filter:none !important;}
+  *{transition-duration:.001ms !important;animation-duration:.001ms !important;}
+}
+
+/* ===================================================================
+   FINAL CTA  ("Bereit für Ihre PV-Montage?")
+   Matches the Zailar template "Got Project in Mind?" block. Base shape
+   (blue bg, near-full-bleed, divider) comes from the template stylesheet;
+   here we (1) scale + centre the German 2-line title, (2) spin the
+   asterisk via CSS (template used Webflow JS we don't run), (3) polish
+   the compact white pill button, (4) tidy responsive alignment.
+   =================================================================== */
+.section.cta{ border-radius:clamp(18px,2vw,28px) !important; overflow:hidden; }
+
+/* title: very large, centred, two balanced lines, premium tracking */
+.section.cta .cta-title-wrapper{ text-align:center !important; }
+.section.cta .cta-title{
+  text-align:center !important;
+  color:#fff; font-weight:600;
+  line-height:1; letter-spacing:-.045em;
+  /* single line that scales with the viewport so it always fits one row */
+  font-size:clamp(19px,4.9vw,98px);
+  white-space:nowrap;
+  margin:0;
+}
+
+/* decorative asterisk: white, smooth infinite spin */
+.section.cta .cta-element{ animation:td-cta-star 9s linear infinite; transform-origin:center center; will-change:transform; }
+@keyframes td-cta-star{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@media(prefers-reduced-motion:reduce){ .section.cta .cta-element{ animation:none; } }
+
+/* compact white pill button with a subtle premium lift on hover */
+.section.cta .cta-button-wrapper .primary-button{
+  white-space:nowrap;
+  transition:transform .3s var(--td-ease), box-shadow .3s var(--td-ease);
+}
+.section.cta .cta-button-wrapper .primary-button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 18px 40px rgba(0,0,20,.22);
+}
+
+/* tablet: keep the bottom row readable; the template already stacks the
+   label above the right group <=991px. Give the right group room. */
+@media(max-width:991px){
+  .section.cta .cta-right-content{ max-width:100%; }
+}
+/* mobile: every bottom element stacks centred (label, asterisk, text, button);
+   title never overflows the screen. */
+@media(max-width:767px){
+  .section.cta .cta-content{ text-align:center; }
+  .section.cta .cta-subtitle-description{ align-items:center; gap:22px; }
+  .section.cta .cta-left-content{ width:100%; display:flex; justify-content:center; }
+  .section.cta .cta-right-content{ flex-direction:column; align-items:center; gap:22px; width:100%; }
+  .section.cta .cta-element-description{ flex-direction:column; align-items:center; gap:16px; text-align:center; }
+  /* explicit size + flex:none so the asterisk never collapses in the column flex */
+  .section.cta .cta-element{ display:block; flex:none; width:54px; height:54px; max-width:54px; }
+  .section.cta .cta-description-text{ text-align:center; }
+  .section.cta .cta-button-wrapper{ padding-bottom:0; width:100%; }
+  .section.cta .cta-button-wrapper .primary-button{ width:100%; }
+  .section.cta .cta-title{ letter-spacing:-.03em; }
+}
+
+/* ===================================================================
+   FOOTER  ->  clean light column grid (top)  +  compact dark info panel
+   (Zailar-style). NO nav-pill / second menu. All content TD-SOLAR.
+   =================================================================== */
+
+/* ---- light part: tidy aligned column grid ---- */
+.td-ftop{
+  display:grid;
+  grid-template-columns:1.5fr .85fr 1.15fr .95fr 1.3fr;
+  gap:clamp(26px,3vw,52px);
+  padding:clamp(40px,4.2vw,72px) 0 clamp(34px,3.4vw,52px);
+  border-top:1px solid var(--td-border);
+}
+.td-ftop-brand-logo{ display:inline-flex; align-items:center; gap:11px; color:#000014; text-decoration:none; }
+.td-ftop-brand-logo>span{ display:inline-flex; flex-direction:column; line-height:1; }
+.td-ftop-brand-logo .m{ width:40px; height:40px; border-radius:11px; background:var(--td-accent); display:grid; place-items:center; flex:none; }
+.td-ftop-brand-logo .m svg{ width:22px; height:22px; color:#fff; }
+.td-ftop-brand-logo b{ font-weight:700; font-size:34px; letter-spacing:-.02em; display:block; line-height:1; }
+.td-ftop-brand-logo small{ color:var(--td-muted); font-size:19px; font-weight:400; line-height:1; margin-top:4px; }
+.td-ftop-desc{ margin:18px 0 0; color:var(--td-muted); font-size:15px; line-height:1.6; max-width:34ch; }
+.td-ftop-col h4{ margin:0 0 16px; font-size:14px; font-weight:600; color:#000014; letter-spacing:-.01em; }
+.td-ftop-h4-tight{ margin-top:22px !important; margin-bottom:4px !important; }
+/* address-column map: rounded, light frame, fixed height, fills its column */
+.td-ftop-map{
+  border-radius:14px; overflow:hidden;
+  border:1px solid var(--td-border);
+  height:clamp(160px,13vw,200px);
+  box-shadow:0 10px 26px -18px rgba(0,0,16,.25);
+}
+.td-ftop-map iframe{ width:100%; height:100%; border:0; display:block; }
+.td-ftop-links{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
+.td-ftop-link{ color:var(--td-muted); font-size:15px; text-decoration:none; transition:color .25s var(--td-ease); }
+.td-ftop-link:hover{ color:var(--td-accent); }
+.td-ftop-item{ margin-bottom:15px; }
+.td-ftop-item:last-child{ margin-bottom:0; }
+.td-ftop-label{ display:block; font-size:12.5px; color:var(--td-muted); margin-bottom:3px; }
+.td-ftop-value{ display:block; color:#000014; font-size:15px; font-weight:500; text-decoration:none; transition:color .25s var(--td-ease); }
+a.td-ftop-value:hover{ color:var(--td-accent); }
+
+/* ---- wide dark info panel (socials left, docs + copyright right) ----
+   Breaks out of the footer's 90px gutter so it spans almost the full viewport with
+   a neat ~20px margin each side; bottom gap 20px so it never sticks to the page edge. */
+.td-foot{
+  position:relative; overflow:hidden;
+  background:#090c13;
+  border-radius:clamp(20px,2vw,28px);
+  padding:clamp(22px,2.4vw,32px) clamp(26px,3.6vw,56px);
+  min-height:clamp(170px,16vw,205px);   /* shorter box; the upright panel is clipped at its bottom */
+  /* cancel the parent 90px gutter and re-add a 20px viewport margin on each side */
+  margin-left:calc(20px - clamp(20px,6vw,90px));
+  margin-right:calc(20px - clamp(20px,6vw,90px));
+  color:#fff;
+}
+/* large tilted flexible solar panel, fully visible inside the dark box near the top centre */
+.td-foot-panel{
+  position:absolute; left:50%; top:clamp(12px,1.4vw,18px);
+  transform:translateX(-50%);            /* upright, natural panel orientation */
+  width:clamp(165px,16vw,205px); height:auto;
+  z-index:0; pointer-events:none; display:block;
+  filter:drop-shadow(0 18px 34px rgba(0,0,0,.45));
+}
+
+.td-foot-row{ position:relative; z-index:1; display:flex; flex-direction:column; justify-content:space-between; min-height:clamp(126px,12vw,160px); gap:clamp(30px,5vw,56px); }
+.td-foot-left{ display:flex; align-items:center; flex-wrap:wrap; gap:clamp(16px,2.2vw,28px); }
+.td-foot-socials{ display:flex; gap:10px; }
+.td-foot-social{
+  color:#fff; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.06);
+  border-radius:100px; padding:11px 18px; font-size:14px; font-weight:500; line-height:1; text-decoration:none;
+  transition:transform .3s var(--td-ease), background-color .3s var(--td-ease);
+}
+.td-foot-social:hover{ background:rgba(255,255,255,.2); transform:translateY(-2px); }
+.td-foot-right{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; text-align:right; }
+.td-foot-docs{ display:flex; flex-wrap:wrap; gap:20px; justify-content:flex-end; }
+.td-foot-doc{ color:rgba(255,255,255,.66); font-size:13.5px; font-weight:500; text-decoration:none; transition:color .25s var(--td-ease); }
+.td-foot-doc:hover{ color:#fff; }
+.td-foot-copy{ color:rgba(255,255,255,.4); font-size:12px; font-weight:400; }
+
+/* tablet: light grid -> 3 cols (brand spans full); map sits in the flow, full col width */
+@media(max-width:1100px){
+  .td-ftop{ grid-template-columns:repeat(3,1fr); }
+  .td-ftop-brand{ grid-column:1 / -1; }
+}
+@media(max-width:680px){
+  .td-ftop{ grid-template-columns:1fr; gap:34px; }   /* single column; content centred per-column, map stays full-bleed */
+  .td-ftop-brand{ grid-column:1 / -1; }
+  .td-ftop-col-map{ grid-column:1 / -1; }
+  .td-foot-row{ flex-direction:column; align-items:center; gap:22px; }
+  .td-foot-right{ align-items:center; text-align:center; }
+  .td-foot-docs{ justify-content:center; }
+  .td-foot-panel{ display:none; }   /* hidden on mobile, like the Zailar template */
+}
+/* mobile: single column; map full width, no horizontal scroll */
+@media(max-width:460px){
+  .td-ftop{ grid-template-columns:1fr; }
+  .td-ftop-map{ height:190px; }
+}
+
+/* =====================================================================
+   MOBILE-ONLY HERO + HEADER REFINEMENTS  (desktop is intentionally untouched)
+   ===================================================================== */
+
+/* 1. HEADER (sizes where the burger is shown) */
+@media(max-width:991px){
+  /* wordmark on ONE line (prevents "TD-SOLAR" breaking at the hyphen); "DC Montage" stays beneath */
+  .td-brand > span{ white-space:nowrap; }
+  /* remove the blue "Beratung vereinbaren" button from the header (replaced by the sticky bottom CTA) */
+  .navbar-right-content .primary-button{ display:none !important; }
+  /* compact burger: tighter spacing between the three lines */
+  .td-burger span + span{ margin-top:3px; }
+}
+
+/* 2. STAT CARD media tile: same corner radius as the card body (was visually larger) */
+@media(max-width:767px){
+  .card-video{ border-radius:8px !important; }
+}
+
+/* 3. HERO CTA buttons: full width, equal left/right gutters (style/height/colour kept) */
+@media(max-width:767px){
+  .td-hero-actions{ flex-direction:column; align-items:stretch; gap:12px; }
+  .td-hero-actions .primary-button{ width:100%; }
+}
+
+/* 4. STICKY BOTTOM CTA bar (mobile only) */
+.td-mobile-cta{ display:none; }
+@media(max-width:991px){
+  .td-mobile-cta{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background:rgba(4,8,20,.62);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    backdrop-filter:blur(18px) saturate(140%);
+    border-top:1px solid rgba(255,255,255,.12);
+  }
+  .td-mcta-call{
+    flex:none; width:48px; height:48px; border-radius:14px;
+    display:grid; place-items:center; text-decoration:none;
+    color:#fff; background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    transition:background-color .3s var(--td-ease);
+  }
+  .td-mcta-call:hover{ background:rgba(255,255,255,.2); }
+  .td-mcta-call svg{ width:22px; height:22px; }
+  .td-mcta-main{ flex:1 1 auto; width:auto; justify-content:center; }
+  /* keep page content (footer) clear of the fixed bar */
+  body{ padding-bottom:calc(72px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* =====================================================================
+   MOBILE-ONLY "ÜBER UNS" REFINEMENTS  (phones; desktop untouched)
+   Order is already: label -> heading -> image -> text -> button
+   (the 2-col grid collapses to one column at <=900px).
+   ===================================================================== */
+@media(max-width:767px){
+  /* 1. heading at 32px, tidy spacing (weight/colour kept from the template) */
+  .section.about-us .about-us-section-title{
+    font-size:32px !important;
+    line-height:1.2 !important;
+    letter-spacing:-1px !important;
+  }
+  .section.about-us .about-us-section-title-wrapper{ margin-bottom:22px; }
+
+  /* 2./3. ORDER: image directly under the heading, then text, then button.
+     The template flips this with `.about-us-typography{order:-1}` on mobile; undo it. */
+  .section.about-us .about-us-content{ gap:22px; }
+  .section.about-us .about-us-image-wrapper{ order:-1 !important; border-radius:14px; overflow:hidden; }
+  .section.about-us .about-us-image{ width:100%; display:block; }
+  .section.about-us .about-us-typography{ order:0 !important; max-width:100%; row-gap:0 !important; }
+  .section.about-us .about-us-description-text{ max-width:100%; }
+  .section.about-us .about-us-button-wrapper{ margin-top:24px !important; }
+
+  /* 4. WhatsApp button: full width of the container, centred label */
+  .section.about-us .about-us-button-wrapper .primary-button{
+    width:100%; justify-content:center; text-align:center;
+  }
+
+  /* 5. windmill on mobile: same animated mark, placed decoratively in the lower-right,
+        fully BELOW the button so it never overlaps heading / text / button */
+  .td-windmill{
+    display:block !important;
+    --mast:clamp(70px,16vw,98px);
+    left:auto; right:clamp(6px,4vw,18px); bottom:0; transform:none;
+    width:clamp(112px,30vw,148px);
+    opacity:.85;
+  }
+  /* reserve clear space under the button for the windmill (id beats the global !important) */
+  #ueber-uns{ padding-bottom:clamp(156px,46vw,210px) !important; }
+}
+
+/* =====================================================================
+   BATCH: header burger icon, highlighted WhatsApp button, and a set of
+   MOBILE-ONLY section refinements (desktop untouched unless noted).
+   ===================================================================== */
+
+/* header burger now uses List.svg, tinted white to match the header */
+.td-burger-ico{ width:26px; height:26px; display:block; filter:brightness(0) invert(1); }
+
+/* Kontakt + modal: make the WhatsApp button unmistakably a button (DESKTOP + mobile) */
+.td-formactions .primary-button.secondary{
+  background:#1faa53 !important;                       /* WhatsApp green */
+  box-shadow:0 12px 26px -12px rgba(31,170,83,.55) !important;
+}
+.td-formactions .primary-button.secondary .primary-button-text-block{ color:#fff !important; }
+
+/* helper duplicates: hidden on desktop, shown only on mobile */
+.td-quality-img-m{ display:none; }
+.td-proj-cta-m{ display:none !important; }
+
+@media(max-width:767px){
+  /* 1. hero stat card: a touch shorter */
+  .banner-card-single{ aspect-ratio:30 / 28; }
+
+  /* 2. Über uns: gap between text and button (standardised to 20px below) */
+  .section.about-us .about-us-button-wrapper{ margin-top:20px !important; }
+
+  /* 3. Unsere Leistungen: header CTA removed (the note CTA below is the single
+        full-width button); service cards stack over one another on scroll */
+  .td-svc-head-side{ display:none; }
+  /* the reveal wrapper must not keep a transform, or it becomes the containing block
+     for the sticky cards and the stack effect breaks */
+  #leistungen .our-services-content{ transform:none !important; }
+  #svc-list{ display:block; }
+  #svc-list .td-svc-card{ position:sticky; top:76px; margin-bottom:16px; }
+  #svc-list .td-svc-card:last-child{ margin-bottom:0; }
+  .td-services-note{ display:flex; flex-direction:column; align-items:stretch; gap:18px; }
+  .td-services-note .primary-button{ width:100%; }
+
+  /* 4. Arbeitsprozess: full-width CTA */
+  .td-proc-cta{ justify-content:stretch; }
+  .td-proc-cta .primary-button{ width:100%; }
+
+  /* 5. Qualität: image directly under the heading */
+  .td-quality-img{ display:none; }
+  .td-quality-img-m{ display:block; border-radius:var(--td-radius); overflow:hidden; aspect-ratio:4 / 3.2; margin:0 0 20px; }
+  .td-quality-img-m img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  /* 7. Projekte: header CTA removed; full-width CTA after the cards */
+  .td-proj-cta{ display:none !important; }
+  .td-proj-cta-m{ display:flex !important; width:100%; margin-top:24px; }
+
+  /* 8. Kontakt: checkbox aligned with the first line of its text; both buttons full width */
+  .td-consent{ flex-wrap:nowrap; align-items:flex-start; }
+  .td-consent input{ margin-top:3px; }
+  .td-formactions{ flex-direction:column; }
+  .td-formactions .primary-button{ width:100%; }
+
+  /* 9. footer: centred content */
+  .td-ftop{ text-align:center; }
+  .td-ftop-brand{ display:flex; flex-direction:column; align-items:center; }
+  .td-ftop-brand-logo{ justify-content:center; }
+  .td-ftop-desc{ margin-left:auto; margin-right:auto; }
+  .td-ftop-col{ display:flex; flex-direction:column; align-items:center; }
+  .td-ftop-links{ align-items:center; }
+  .td-ftop-item{ width:100%; }
+  .td-foot-row{ align-items:center; text-align:center; }
+  .td-foot-left{ justify-content:center; width:100%; }
+  .td-foot-socials{ justify-content:center; }
+  .td-foot-right{ align-items:center; text-align:center; width:100%; }
+  .td-foot-docs{ justify-content:center; }
+}
+
+/* =====================================================================
+   BATCH 2 (mobile): footer reorg, uniform 20px block->button gaps,
+   80px gaps between blocks.
+   ===================================================================== */
+@media(max-width:680px){
+  /* 1a. footer: Kontakt (3rd col) above Navigation (2nd col); keep brand first, then Adresse, map */
+  .td-ftop > :nth-child(1){ order:1; }   /* brand */
+  .td-ftop > :nth-child(3){ order:2; }   /* Kontakt */
+  .td-ftop > :nth-child(2){ order:3; }   /* Navigation */
+  .td-ftop > :nth-child(4){ order:4; }   /* Adresse */
+  .td-ftop > .td-ftop-col-map{ order:5; }
+
+  /* 1b. map full-bleed handled by the <=991 footer block below (negative gutter margins) */
+
+  /* 1c. bottom legal documents in a single row */
+  .td-foot-docs{ flex-wrap:nowrap; gap:8px; }
+  .td-foot-doc{ white-space:nowrap; font-size:11px; }
+}
+
+@media(max-width:767px){
+  /* 2. uniform 20px distance from the preceding block to every CTA button */
+  .td-hero-actions{ margin-top:20px !important; }
+  .section.about-us .about-us-button-wrapper{ margin-top:20px !important; }
+  .td-services-note{ gap:20px; }
+  .td-proc-cta{ margin-top:20px !important; }
+  #qualitaet .td-quality-chips{ margin-bottom:0; }
+  #qualitaet .reveal > .primary-button{ margin-top:20px; }
+  .td-proj-cta-m{ margin-top:20px !important; }
+  .td-formactions{ margin-top:20px !important; }
+
+  /* 3. 80px gap between blocks (40px top + 40px bottom per section) */
+  .section:not(.banner):not(.footer){ padding-top:40px !important; padding-bottom:40px !important; }
+  #ablauf{ padding-bottom:40px !important; }
+  #qualitaet{ padding-top:40px !important; }
+}
+
+/* Über uns (mobile): smaller gap between the last paragraph and the WhatsApp button
+   (the template adds a 25px row-gap to the typography; it is removed above) */
+@media(max-width:767px){
+  .section.about-us .about-us-button-wrapper{ margin-top:12px !important; }
+}
+
+/* =====================================================================
+   FOOTER fully centred across the WHOLE mobile range (up to 991px, where
+   the burger shows). Single centred column; map full-bleed; docs one row.
+   ===================================================================== */
+@media(max-width:991px){
+  .td-ftop{ grid-template-columns:1fr !important; gap:34px; text-align:center; }
+  .td-ftop-brand{ display:flex; flex-direction:column; align-items:center; grid-column:1 / -1; }
+  .td-ftop-brand-logo{ justify-content:center; }
+  .td-ftop-desc{ margin-left:auto; margin-right:auto; }
+  .td-ftop-col{ display:flex; flex-direction:column; align-items:center; }
+  .td-ftop-links{ align-items:center; }
+  .td-ftop-item{ width:100%; }
+  /* map stretched to the full screen width (full-bleed via negative gutter margins,
+     so it never widens the document or shifts the centred text). NB the column is also
+     a .td-ftop-col (flex, align-items:center), so the map must be forced to stretch */
+  .td-ftop-col-map{ grid-column:1 / -1; width:auto; max-width:none; transform:none; margin-inline:calc(-1 * clamp(20px,6vw,90px)); align-items:stretch; }
+  .td-ftop-col-map > h4{ text-align:center; }
+  .td-ftop-map{ width:100%; align-self:stretch; height:240px; border-radius:0; border-left:0; border-right:0; }
+  /* contacts above navigation: Kontakt(3rd) before Navigation(2nd) */
+  .td-ftop > :nth-child(1){ order:1; }
+  .td-ftop > :nth-child(3){ order:2; }
+  .td-ftop > :nth-child(2){ order:3; }
+  .td-ftop > :nth-child(4){ order:4; }
+  .td-ftop > .td-ftop-col-map{ order:5; }
+  /* bottom dark bar centred, docs in one row */
+  .td-foot-row{ flex-direction:column; align-items:center; text-align:center; gap:22px; }
+  .td-foot-left, .td-foot-socials{ justify-content:center; width:100%; }
+  .td-foot-right{ align-items:center; text-align:center; width:100%; }
+  .td-foot-docs{ justify-content:center; flex-wrap:nowrap; gap:8px; }
+  .td-foot-doc{ white-space:nowrap; font-size:11px; }
+  .td-foot-panel{ display:none; }
+}
