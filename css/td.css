@@ -825,7 +825,7 @@ a.td-ftop-value:hover{ color:var(--td-accent); }
     display:block !important;
     --mast:clamp(70px,16vw,98px);
     left:auto; right:clamp(6px,4vw,18px); bottom:0; transform:none;
-    width:clamp(84px,21vw,104px);
+    width:clamp(96px,24vw,118px);
     opacity:.85;
   }
   /* blades scaled to the mast (hub stays locked on the mast top via translate(-50%,-50%)) */
