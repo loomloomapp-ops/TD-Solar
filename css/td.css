@@ -983,3 +983,106 @@ a.td-ftop-value:hover{ color:var(--td-accent); }
   .td-foot-doc{ white-space:nowrap; font-size:11px; }
   .td-foot-panel{ display:none; }
 }
+
+/* =====================================================================
+   BRAND PRELOADER  -  "DC charge" intro
+   A single light/current sweeps L->R through the TD-SOLAR wordmark and
+   charges it from dim to lit, a conductor rail draws in sync, then the
+   overlay lifts away smoothly. No spinner, no 0-100%.
+   Tune everything via the CSS variables on #td-preloader below.
+   ===================================================================== */
+#td-preloader{
+  --pl-bg:#000014;                  /* brand ink backdrop */
+  --pl-dim:rgba(255,255,255,.14);   /* unpowered wordmark */
+  --pl-lit:#ffffff;                 /* charged wordmark */
+  --pl-accent:#2f6bff;              /* DC current / glow (brand blue, brightened) */
+  --pl-sub:rgba(255,255,255,.52);   /* "DC Montage" subline */
+  --pl-size:clamp(30px,7vw,58px);   /* wordmark size (responsive) */
+  --pl-sweep:1.05s;                 /* charge-sweep duration */
+  --pl-exit:.7s;                    /* fade-out duration */
+  --pl-ease:cubic-bezier(.16,1,.3,1);
+
+  position:fixed; inset:0; z-index:100000;
+  display:grid; place-items:center;
+  background:
+    radial-gradient(120% 90% at 50% 42%, rgba(47,107,255,.10), transparent 60%),
+    var(--pl-bg);
+  opacity:1; visibility:visible;
+  transition:opacity var(--pl-exit) var(--pl-ease),
+             visibility 0s linear var(--pl-exit);
+}
+#td-preloader .td-pl__logo{
+  position:relative; display:flex; flex-direction:column; align-items:center;
+  font-family:Geist,system-ui,sans-serif;
+  animation:tdpl-rise .6s var(--pl-ease) both;
+}
+#td-preloader .td-pl__word{
+  position:relative; display:inline-block; white-space:nowrap;
+  font-size:var(--pl-size); font-weight:700; letter-spacing:-.02em; line-height:1;
+  animation:tdpl-pulse .8s var(--pl-ease) calc(.3s + var(--pl-sweep)) both;
+}
+#td-preloader .td-pl__dim{ color:var(--pl-dim); }
+#td-preloader .td-pl__lit{
+  position:absolute; inset:0; color:var(--pl-lit);
+  clip-path:inset(0 100% 0 0);
+  animation:tdpl-charge var(--pl-sweep) var(--pl-ease) .3s forwards;
+}
+/* the travelling DC "current" line, riding the leading edge of the charge */
+#td-preloader .td-pl__spark{
+  position:absolute; top:-9%; left:0; width:2px; height:118%;
+  border-radius:2px;
+  background:linear-gradient(180deg, transparent, var(--pl-accent) 22%, #cfe0ff 50%, var(--pl-accent) 78%, transparent);
+  box-shadow:0 0 14px 3px rgba(47,107,255,.6);
+  opacity:0;
+  animation:tdpl-spark var(--pl-sweep) var(--pl-ease) .3s forwards;
+}
+#td-preloader .td-pl__sub{
+  margin-top:14px; font-size:calc(var(--pl-size) * .2);
+  font-weight:500; letter-spacing:.34em; text-transform:uppercase;
+  color:var(--pl-sub); opacity:0;
+  animation:tdpl-fade .55s var(--pl-ease) calc(.3s + var(--pl-sweep) * .55) both;
+}
+/* conductor rail drawn under the wordmark in sync with the charge */
+#td-preloader .td-pl__rail{
+  margin-top:16px; width:min(64vw,320px); height:1px;
+  background:linear-gradient(90deg, transparent, var(--pl-accent), var(--pl-lit), transparent);
+  transform:scaleX(0); transform-origin:left center; opacity:0;
+  animation:tdpl-rail var(--pl-sweep) var(--pl-ease) .3s forwards;
+}
+
+@keyframes tdpl-rise{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+@keyframes tdpl-charge{ from{clip-path:inset(0 100% 0 0)} to{clip-path:inset(0 0 0 0)} }
+@keyframes tdpl-spark{
+  0%{ left:0; opacity:0 }
+  14%{ opacity:1 }
+  86%{ opacity:1 }
+  100%{ left:100%; opacity:0 }
+}
+@keyframes tdpl-rail{
+  0%{ transform:scaleX(0); opacity:0 }
+  12%{ opacity:.9 }
+  100%{ transform:scaleX(1); opacity:.9 }
+}
+@keyframes tdpl-fade{ from{opacity:0} to{opacity:1} }
+@keyframes tdpl-pulse{
+  0%{ transform:scale(1) }
+  38%{ transform:scale(1.012) }
+  100%{ transform:scale(1) }
+}
+
+/* smooth exit (added by JS once the page has loaded) */
+#td-preloader.is-done{ opacity:0; visibility:hidden; pointer-events:none; }
+
+/* scroll lock while loading (mirrors the critical inline rule) */
+html.td-loading, html.td-loading body{ overflow:hidden; }
+
+/* respect reduced motion: drop the choreography, keep a calm charged logo + fade */
+@media (prefers-reduced-motion: reduce){
+  #td-preloader .td-pl__logo,
+  #td-preloader .td-pl__word{ animation:none; }
+  #td-preloader .td-pl__lit{ clip-path:inset(0 0 0 0); animation:none; }
+  #td-preloader .td-pl__spark{ display:none; }
+  #td-preloader .td-pl__rail{ transform:scaleX(1); opacity:.55; animation:none; }
+  #td-preloader .td-pl__sub{ opacity:1; animation:none; }
+  #td-preloader{ transition:opacity .4s linear; }
+}

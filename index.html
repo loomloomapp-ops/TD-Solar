@@ -23,9 +23,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- VISUAL SOURCE OF TRUTH: the template's own stylesheet (linked in place) -->
-  <link rel="stylesheet" href="assets/SaveWeb2ZIP%20Website%20Copier%20(1)/css/zailar.webflow.shared.59aa64a93.css?v=20260622d">
+  <link rel="stylesheet" href="assets/SaveWeb2ZIP%20Website%20Copier%20(1)/css/zailar.webflow.shared.59aa64a93.css?v=20260622e">
   <!-- thin override layer (hero photo, button hover, our 3 extra blocks) -->
-  <link rel="stylesheet" href="css/td.css?v=20260622d">
+  <link rel="stylesheet" href="css/td.css?v=20260622e">
+
+  <!-- critical preloader paint (covers instantly, before td.css resolves) -->
+  <style>
+    html.td-loading,html.td-loading body{overflow:hidden!important}
+    #td-preloader{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:#000014}
+  </style>
 
   <!-- Windmill positioning, inlined so it ships WITH index.html and overrides any
        cached/stale css/td.css on the server. Anchors the propeller from the bottom
@@ -72,6 +78,53 @@
   </script>
 </head>
 <body>
+
+<!-- ===================== BRAND PRELOADER (DC "charge" intro) ===================== -->
+<div id="td-preloader" class="td-pl" role="status" aria-live="polite" aria-label="TD-SOLAR wird geladen">
+  <div class="td-pl__logo" aria-hidden="true">
+    <span class="td-pl__word">
+      <span class="td-pl__dim">TD-SOLAR</span>
+      <span class="td-pl__lit">TD-SOLAR</span>
+      <i class="td-pl__spark"></i>
+    </span>
+    <span class="td-pl__sub">DC Montage</span>
+    <span class="td-pl__rail"></span>
+  </div>
+</div>
+<script>
+/* Self-contained preloader controller: locks scroll while loading, plays the brand
+   intro for a minimum time, then fades out smoothly. Hard fallbacks guarantee the
+   site is never left stuck behind the overlay (load may have already fired, the
+   transition may not emit, JS may run late). No dependencies. */
+(function () {
+  var doc = document.documentElement;
+  var pl = document.getElementById('td-preloader');
+  if (!pl) { return; }
+  doc.classList.add('td-loading');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var MIN = reduce ? 450 : 1700;          // let the brand intro play fully
+  var start = Date.now();
+  var done = false;
+  function cleanup() {
+    doc.classList.remove('td-loading');
+    if (pl && pl.parentNode) { pl.parentNode.removeChild(pl); pl = null; }
+  }
+  function finish() {
+    if (done) { return; } done = true;
+    var wait = Math.max(0, MIN - (Date.now() - start));
+    setTimeout(function () {
+      doc.classList.remove('td-loading');   // restore scroll immediately on exit
+      pl.classList.add('is-done');
+      pl.addEventListener('transitionend', cleanup, { once: true });
+      setTimeout(cleanup, 1000);            // fallback if transitionend never fires
+    }, wait);
+  }
+  if (document.readyState === 'complete') { finish(); }
+  else { window.addEventListener('load', finish); }
+  setTimeout(finish, 6000);                 // ultimate safety net
+})();
+</script>
+
 <div class="page-wrapper">
 
   <!-- ===================== NAVIGATION ===================== -->
@@ -628,7 +681,7 @@
   </div>
 </div>
 
-<script src="js/td.js?v=20260622d"></script>
-<script type="module" src="js/anim.js?v=20260622d"></script>
+<script src="js/td.js?v=20260622e"></script>
+<script type="module" src="js/anim.js?v=20260622e"></script>
 </body>
 </html>
