@@ -44,6 +44,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* headline: main offer, bigger; two lines on desktop (controlled break), natural wrap on mobile */
 .banner-heading{font-size:clamp(2.3rem,5vw,4rem) !important;letter-spacing:-.035em !important;line-height:1.04 !important;font-weight:600 !important;}
+/* keep "DC-Montage" intact: the hyphen must not become a line break */
+.td-nowrap{white-space:nowrap;}
 .banner-heading-wrapper{max-width:1280px;margin-inline:auto;}
 .hb-break{display:none;}
 @media(min-width:900px){
@@ -816,14 +818,18 @@ a.td-ftop-value:hover{ color:var(--td-accent); }
   }
 
   /* 5. windmill on mobile: same animated mark, placed decoratively in the lower-right,
-        fully BELOW the button so it never overlaps heading / text / button */
+        fully BELOW the button so it never overlaps heading / text / button.
+        Tower position (right/bottom) is unchanged; the propeller is sized to match
+        the mast so its hub sits ON the tower top instead of floating oversized. */
   .td-windmill{
     display:block !important;
     --mast:clamp(70px,16vw,98px);
     left:auto; right:clamp(6px,4vw,18px); bottom:0; transform:none;
-    width:clamp(112px,30vw,148px);
+    width:clamp(84px,21vw,104px);
     opacity:.85;
   }
+  /* blades scaled to the mast (hub stays locked on the mast top via translate(-50%,-50%)) */
+  .td-windmill .td-windmill-blades{ width:118%; }
   /* reserve clear space under the button for the windmill (id beats the global !important) */
   #ueber-uns{ padding-bottom:clamp(156px,46vw,210px) !important; }
 }
