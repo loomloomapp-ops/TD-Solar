@@ -23,9 +23,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- VISUAL SOURCE OF TRUTH: the template's own stylesheet (linked in place) -->
-  <link rel="stylesheet" href="assets/SaveWeb2ZIP%20Website%20Copier%20(1)/css/zailar.webflow.shared.59aa64a93.css?v=20260622c">
+  <link rel="stylesheet" href="assets/SaveWeb2ZIP%20Website%20Copier%20(1)/css/zailar.webflow.shared.59aa64a93.css?v=20260622d">
   <!-- thin override layer (hero photo, button hover, our 3 extra blocks) -->
-  <link rel="stylesheet" href="css/td.css?v=20260622c">
+  <link rel="stylesheet" href="css/td.css?v=20260622d">
+
+  <!-- Windmill positioning, inlined so it ships WITH index.html and overrides any
+       cached/stale css/td.css on the server. Anchors the propeller from the bottom
+       with a single variable (no nested calc) so the hub sits on the mast top in
+       iOS Safari too; placed after the td.css link so it wins on source order. -->
+  <style id="td-windmill-fix">
+    .td-windmill{ height:var(--mast); overflow:visible; }
+    .td-windmill .td-windmill-blades{
+      top:auto;
+      bottom:var(--mast);
+      transform:translate(-50%,50%) rotate(0deg);
+      transform-origin:center center;
+      animation:td-windmill-spin2 7s linear infinite;
+    }
+    @keyframes td-windmill-spin2{
+      from{ transform:translate(-50%,50%) rotate(0deg); }
+      to{   transform:translate(-50%,50%) rotate(360deg); }
+    }
+    @media(prefers-reduced-motion:reduce){
+      .td-windmill .td-windmill-blades{ animation:none; }
+    }
+    @media(max-width:767px){
+      .td-windmill{ width:clamp(96px,24vw,118px) !important; }
+      .td-windmill .td-windmill-blades{ width:118%; }
+    }
+  </style>
 
   <!-- LCP: preload hero photo; preconnect to Motion CDN -->
   <link rel="preload" as="image" href="assets/img/hero-banner.png" fetchpriority="high">
@@ -602,7 +628,7 @@
   </div>
 </div>
 
-<script src="js/td.js?v=20260622c"></script>
-<script type="module" src="js/anim.js?v=20260622c"></script>
+<script src="js/td.js?v=20260622d"></script>
+<script type="module" src="js/anim.js?v=20260622d"></script>
 </body>
 </html>
