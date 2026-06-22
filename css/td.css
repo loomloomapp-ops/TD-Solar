@@ -127,36 +127,38 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* Windmill (decorative, right side of "Über uns").
    Position of the whole windmill (right / bottom / overall zone) is unchanged.
-   The container is sized height = 2 * mast, anchored bottom:0 on the about/grey seam.
-   The MAST is static, base on the seam (bottom:0), height = --mast, so its TOP is at
-   exactly --mast above the seam = the vertical mid-line of the container.
-   The BLADES are absolute at top:50% / left:50% with translate(-50%,-50%), so their
-   HUB (their own centre, transform-origin center center) sits EXACTLY on the mast top.
-   translate(-50%,-50%) is present in the base rule AND in both keyframes, so the
-   propeller pivots around its hub and never drifts or flies off the axis. */
+   The container bottom sits on the about/grey seam; its height IS the mast height
+   (single var, no nested calc -> resolves identically in WebKit/iOS Safari and Blink).
+   The MAST is static, base on the seam (bottom:0), height = --mast.
+   The BLADES are anchored from the BOTTOM at `bottom:var(--mast)` (their bottom edge on
+   the mast top) and then translate(-50%,50%) drops them by half their height so their
+   CENTRE (= hub) lands EXACTLY on the mast top. Anchoring from the bottom with one
+   variable avoids the previous `top:50%` + `height:calc(var(--mast)*2)` coupling, which
+   iOS Safari could miscompute -> the propeller would "fly up" off the mast.
+   translate(-50%,50%) is present in the base rule AND both keyframes, so the propeller
+   pivots around its hub and never drifts. */
 .td-windmill{
   --mast:clamp(135px,12.5vw,188px);
   position:absolute;
   right:clamp(16px,2.6vw,52px);                 /* unchanged */
   bottom:0;                                     /* unchanged: container bottom on the seam */
-  width:clamp(150px,15vw,224px);                /* = blades width */
-  height:calc(var(--mast) * 2);                 /* mid-line == mast top == hub */
+  width:clamp(150px,15vw,224px);                /* blades width reference */
+  height:var(--mast);                           /* simple single var; blades overflow up */
   z-index:1; pointer-events:none;
 }
-/* blades: centred on the container mid-line, rotate around their own hub, no drift.
-   width:108% enlarges only the propeller; left/top:50% + translate(-50%,-50%) keep the
-   hub locked on the mast top regardless of size (no shift). */
+/* blades: bottom edge pinned to the mast top, then dropped half-height so the hub
+   (their centre) sits on the mast top; rotate around that centre, no drift. */
 .td-windmill-blades{
-  position:absolute; left:50%; top:50%; z-index:1;
+  position:absolute; left:50%; bottom:var(--mast); z-index:1;
   width:108%; height:auto; display:block;
-  transform:translate(-50%,-50%) rotate(0deg);
+  transform:translate(-50%,50%) rotate(0deg);
   transform-origin:center center;
   animation:td-windmill-spin 7s linear infinite;
   will-change:transform;
 }
 @keyframes td-windmill-spin{
-  from{ transform:translate(-50%,-50%) rotate(0deg); }
-  to{   transform:translate(-50%,-50%) rotate(360deg); }
+  from{ transform:translate(-50%,50%) rotate(0deg); }
+  to{   transform:translate(-50%,50%) rotate(360deg); }
 }
 /* static mast: centred, base exactly on the seam, top meets the hub */
 .td-windmill-tower{
@@ -819,8 +821,9 @@ a.td-ftop-value:hover{ color:var(--td-accent); }
 
   /* 5. windmill on mobile: same animated mark, placed decoratively in the lower-right,
         fully BELOW the button so it never overlaps heading / text / button.
-        Tower position (right/bottom) is unchanged; the propeller is sized to match
-        the mast so its hub sits ON the tower top instead of floating oversized. */
+        Tower position (right/bottom) unchanged; only --mast + size change. The blades
+        inherit the robust bottom-anchored positioning from the base rule, so the hub
+        stays glued to the mast top on iOS Safari too. */
   .td-windmill{
     display:block !important;
     --mast:clamp(70px,16vw,98px);
@@ -828,7 +831,7 @@ a.td-ftop-value:hover{ color:var(--td-accent); }
     width:clamp(96px,24vw,118px);
     opacity:.85;
   }
-  /* blades scaled to the mast (hub stays locked on the mast top via translate(-50%,-50%)) */
+  /* blades scaled to the mast (hub stays locked on the mast top via translate(-50%,50%)) */
   .td-windmill .td-windmill-blades{ width:118%; }
   /* reserve clear space under the button for the windmill (id beats the global !important) */
   #ueber-uns{ padding-bottom:clamp(156px,46vw,210px) !important; }
